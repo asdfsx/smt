@@ -2,13 +2,12 @@ package tskeygen
 
 import (
 	"crypto/rand"
+	"math/big"
+	"sync"
 
 	"github.com/lianghuiqiang9/smt/modfiysm2"
 	"github.com/lianghuiqiang9/smt/network"
 	"github.com/lianghuiqiang9/smt/zk"
-
-	"math/big"
-	"sync"
 )
 
 type Round1Info struct {

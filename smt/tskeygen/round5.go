@@ -14,8 +14,8 @@ type Round5Info struct {
 	FromNum int
 	Deltaix *big.Int
 	Deltaiy *big.Int
-	logp1   *zk.Logp
-	logp2   *zk.Logp
+	Logp1   *zk.Logp
+	Logp2   *zk.Logp
 	Deltai  *big.Int
 }
 
@@ -23,8 +23,8 @@ func (p *Round5Info) DoSomething(party *network.Party, net *network.Network, Sec
 	//接下来就要验证Output的一些信息，是否计算准确了。肯定又是一个大难关呀。加油吧。
 	//验证两个zk
 	net.Mtx.Lock()
-	flag := p.logp1.LogVerify(net.Hash, net.Parties[p.FromNum].Curve, net.Parties[p.FromNum].Yix, net.Parties[p.FromNum].Yiy)
-	flag1 := p.logp2.LogVerify1(net.Hash, net.Parties[p.FromNum].Curve, p.Deltaix, p.Deltaiy, net.Parties[p.FromNum].Gammax, net.Parties[p.FromNum].Gammay)
+	flag := p.Logp1.LogVerify(net.Hash, net.Parties[p.FromNum].Curve, net.Parties[p.FromNum].Yix, net.Parties[p.FromNum].Yiy)
+	flag1 := p.Logp2.LogVerify1(net.Hash, net.Parties[p.FromNum].Curve, p.Deltaix, p.Deltaiy, net.Parties[p.FromNum].Gammax, net.Parties[p.FromNum].Gammay)
 	net.Mtx.Unlock()
 	if flag != true {
 		fmt.Println("error", p.FromID)

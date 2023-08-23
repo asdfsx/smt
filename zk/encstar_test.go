@@ -58,7 +58,7 @@ func TestEncstar(t *testing.T) {
 	hash := sha256.New()
 	proof := EncstarProof(hash, priv.Curve, public, private)
 
-	flag := proof.EncstarVerify(hash, public)
+	flag := proof.EncstarVerify(hash, priv.Curve, public)
 	fmt.Println("flag ", flag)
 
 }

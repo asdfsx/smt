@@ -6,6 +6,8 @@ import (
 	"hash"
 	"math/big"
 
+	"github.com/fxamacker/cbor/v2"
+
 	msm2 "github.com/lianghuiqiang9/smt/modfiysm2"
 )
 
@@ -94,4 +96,23 @@ func (zkp *Logp) LogVerify1(hash hash.Hash, curve elliptic.Curve, Ax, Ay, Gx, Gy
 	z2Gx, z2Gy := curve.Add(zkp.alphaGx, zkp.alphaGy, epkx, epky)
 
 	return zGx.Cmp(z2Gx) == 0 && zGy.Cmp(z2Gy) == 0
+}
+
+func (zkp *Logp) MarshalBinary() ([]byte, error) {
+	tmp := [4][]byte{zkp.alphaGx.Bytes(), zkp.alphaGy.Bytes(), zkp.e.Bytes(), zkp.z.Bytes()}
+	return cbor.Marshal(tmp)
+}
+
+func (zkp *Logp) UnmarshalBinary(data []byte) error {
+	var tmp [4][]byte
+	err := cbor.Unmarshal(data, &tmp)
+	if err != nil {
+		return err
+	}
+
+	zkp.alphaGx = new(big.Int).SetBytes(tmp[0])
+	zkp.alphaGy = new(big.Int).SetBytes(tmp[1])
+	zkp.e = new(big.Int).SetBytes(tmp[2])
+	zkp.z = new(big.Int).SetBytes(tmp[3])
+	return nil
 }

@@ -69,7 +69,6 @@ type Commitment struct {
 }
 
 type Proof struct {
-	curve elliptic.Curve
 	*Commitment
 	// Z1 = Z₁ = α + e⋅x
 	Z1 *safenum.Int
@@ -179,7 +178,6 @@ func EncstarProof(hash hash.Hash, curve elliptic.Curve, public Public, private P
 	wY.ModMul(wY, rhoY, N1)
 
 	return &Proof{
-		curve:      curve,
 		Commitment: commitment,
 		Z1:         z1,
 		Z2:         z2,
@@ -190,7 +188,7 @@ func EncstarProof(hash hash.Hash, curve elliptic.Curve, public Public, private P
 	}
 }
 
-func (p Proof) EncstarVerify(hash hash.Hash, public Public) bool {
+func (p Proof) EncstarVerify(hash hash.Hash, curve elliptic.Curve, public Public) bool {
 	if !p.IsValid(public) {
 		return false
 	}
@@ -236,13 +234,13 @@ func (p Proof) EncstarVerify(hash hash.Hash, public Public) bool {
 
 	{
 		e2 := e.Abs().Big()
-		e2.Mod(e2, p.curve.Params().N)
+		e2.Mod(e2, curve.Params().N)
 		z := p.Z1.Abs().Big()
-		z.Mod(z, p.curve.Params().N)
+		z.Mod(z, curve.Params().N)
 
-		zGx, zGy := p.curve.ScalarBaseMult(z.Bytes())
-		epkx, epky := p.curve.ScalarMult(public.Xx, public.Xy, e2.Bytes())
-		z2Gx, z2Gy := p.curve.Add(p.Commitment.Bxx, p.Commitment.Bxy, epkx, epky)
+		zGx, zGy := curve.ScalarBaseMult(z.Bytes())
+		epkx, epky := curve.ScalarMult(public.Xx, public.Xy, e2.Bytes())
+		z2Gx, z2Gy := curve.Add(p.Commitment.Bxx, p.Commitment.Bxy, epkx, epky)
 		ff := zGx.Cmp(z2Gx) == 0 && zGy.Cmp(z2Gy) == 0
 		if ff != true {
 			return false

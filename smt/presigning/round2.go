@@ -3,12 +3,11 @@ package presigning
 import (
 	"fmt"
 	"math/big"
+	"sync"
 
 	"github.com/lianghuiqiang9/smt/modfiysm2"
 	"github.com/lianghuiqiang9/smt/network"
 	"github.com/lianghuiqiang9/smt/zk"
-
-	"sync"
 
 	"github.com/cronokirby/safenum"
 	"github.com/lianghuiqiang9/smt/paillier"
@@ -36,7 +35,7 @@ func (p *Round2Info) DoSomething(party *network.Party, net *network.Network, Sec
 		Aux:      party.Aux,
 	}
 	net.Mtx.Lock()
-	flag := p.Encstarp.EncstarVerify(net.Hash, public)
+	flag := p.Encstarp.EncstarVerify(net.Hash, party.Curve, public)
 	net.Mtx.Unlock()
 	if flag != true {
 		fmt.Println("error", p.FromID)

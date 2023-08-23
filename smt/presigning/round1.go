@@ -2,14 +2,13 @@ package presigning
 
 import (
 	"fmt"
+	"math/big"
+	"sync"
 
 	"github.com/lianghuiqiang9/smt/modfiysm2"
 	"github.com/lianghuiqiang9/smt/network"
 	"github.com/lianghuiqiang9/smt/vss"
 	"github.com/lianghuiqiang9/smt/zk"
-
-	"math/big"
-	"sync"
 
 	"github.com/cronokirby/safenum"
 	"github.com/lianghuiqiang9/smt/paillier"
