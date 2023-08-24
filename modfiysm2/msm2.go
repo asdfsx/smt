@@ -6,10 +6,10 @@ import (
 	"crypto/rand"
 	"hash"
 
-	"github.com/lianghuiqiang9/smt/network"
-
 	"io"
 	"math/big"
+
+	"github.com/lianghuiqiang9/smt/network"
 )
 
 var one = new(big.Int).SetInt64(1) //将1变成大数

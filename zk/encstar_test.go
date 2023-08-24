@@ -6,12 +6,9 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/cronokirby/saferith"
 	msm2 "github.com/lianghuiqiang9/smt/modfiysm2"
-
-	"github.com/cronokirby/safenum"
-
 	"github.com/taurusgroup/multi-party-sig/pkg/math/sample"
-	//	mzk "github.com/taurusgroup/multi-party-sig/pkg/zk"
 	"github.com/tjfoc/gmsm/sm2"
 )
 
@@ -21,7 +18,7 @@ func TestEncstar(t *testing.T) {
 
 	xi, _ := msm2.RandFieldElement(priv.Curve, nil)
 
-	x := new(safenum.Int).SetBig(xi, xi.BitLen())
+	x := new(saferith.Int).SetBig(xi, xi.BitLen())
 
 	Xx, Xy := priv.Curve.ScalarBaseMult(xi.Bytes())
 
@@ -29,7 +26,7 @@ func TestEncstar(t *testing.T) {
 	verifierPedersen := Pedersen
 	prover := ProverPaillierPublic
 
-	c := new(safenum.Int).SetUint64(12)
+	c := new(saferith.Int).SetUint64(12)
 	C, _ := verifierPaillier.Enc(c)
 
 	y := sample.IntervalLPrime(rand.Reader)

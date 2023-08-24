@@ -6,14 +6,10 @@ import (
 	"math/big"
 	"sync"
 
-	//	paillierbig "github.com/roasbeef/go-go-gadget-paillier"
-
 	"github.com/lianghuiqiang9/smt/network"
 	"github.com/lianghuiqiang9/smt/paillier"
-
 	"github.com/taurusgroup/multi-party-sig/pkg/hash"
-	//	"github.com/taurusgroup/multi-party-sig/pkg/paillier"
-
+	"github.com/taurusgroup/multi-party-sig/pkg/math/arith"
 	"github.com/taurusgroup/multi-party-sig/pkg/pedersen"
 	"github.com/taurusgroup/multi-party-sig/pkg/pool"
 	mod "github.com/taurusgroup/multi-party-sig/pkg/zk/mod"
@@ -69,9 +65,7 @@ func Round1(party *network.Party, net *network.Network, SecretInfo network.MSecr
 	ped, lambda := PaillierSecertKey.GeneratePedersen()
 	//生成prm证明
 	public1 := prm.Public{
-		N: ped.N(),
-		S: ped.S(),
-		T: ped.T(),
+		Aux: pedersen.New(arith.ModulusFromN(ped.N()), ped.S(), ped.T()),
 	}
 
 	Prmproof := prm.NewProof(prm.Private{

@@ -3,14 +3,10 @@ package mta
 import (
 	"fmt"
 	"math/big"
-
 	"testing"
 
-	"github.com/lianghuiqiang9/smt/network"
-
 	"github.com/lianghuiqiang9/smt/modfiysm2"
-
-	//	paillierbig "github.com/roasbeef/go-go-gadget-paillier"
+	"github.com/lianghuiqiang9/smt/network"
 	"github.com/lianghuiqiang9/smt/paillier"
 	"github.com/tjfoc/gmsm/sm2"
 )
@@ -43,7 +39,7 @@ func TestMtA(t *testing.T) {
 
 		SecretInfoi.Xi, _ = modfiysm2.RandFieldElement(C, nil)
 		SecretInfoi.Gammai, _ = modfiysm2.RandFieldElement(C, nil)
-		//		G := new(safenum.Int).SetBig(SecretInfoi.Xi, SecretInfoi.Xi.BitLen())
+		//		G := new(saferith.Int).SetBig(SecretInfoi.Xi, SecretInfoi.Xi.BitLen())
 		//		SecretInfoi.EncXi, _ = paillierPublic.Enc(G)
 
 		c, _ := paillierpubkey.Enc1(SecretInfoi.Xi)
@@ -64,8 +60,8 @@ func TestMtA(t *testing.T) {
 	c := new(big.Int).Mul(a, b)
 	c.Mod(c, C.Params().N)
 
-	//	a1safe := new(safenum.Int).SetBig(a1, a1.BitLen())
-	//	a2safe := new(safenum.Int).SetBig(a2, a2.BitLen())
+	//	a1safe := new(saferith.Int).SetBig(a1, a1.BitLen())
+	//	a2safe := new(saferith.Int).SetBig(a2, a2.BitLen())
 
 	//	Ea1, _ := net.Parties[0].PaillierPublickey.Enc(a1safe)
 	//	Ea2, _ := net.Parties[1].PaillierPublickey.Enc(a2safe)
@@ -81,12 +77,12 @@ func TestMtA(t *testing.T) {
 	Beta12neg.Mod(Beta12neg, C.Params().N)
 
 	fmt.Println("Beta12neg", Beta12, C.Params().N, Beta12neg, Beta12neg.Bytes())
-	// Beta12negsafe := new(safenum.Int).SetBig(Beta12neg, Beta12neg.BitLen())
+	// Beta12negsafe := new(saferith.Int).SetBig(Beta12neg, Beta12neg.BitLen())
 	// EBeta12negsafe, _ := net.Parties[1].PaillierPublickey.Enc(Beta12negsafe)
 	EBeta12negsafe, _ := net.Parties[1].PaillierPublickey.Enc1(Beta12neg)
 	DBeta12negsafe, _ := SecertInfo["b"].PaillierSecertKey.Dec1(EBeta12negsafe)
 	fmt.Println("DBeta12negsafe", DBeta12negsafe)
-	// b1safe := new(safenum.Int).SetBig(b1, b1.BitLen())
+	// b1safe := new(saferith.Int).SetBig(b1, b1.BitLen())
 	// Ea2.Mul(net.Parties[1].PaillierPublickey, b1safe)
 	// Ea2.Add(net.Parties[1].PaillierPublickey, EBeta12negsafe)
 	Ea2 = Ea2.Mul1(net.Parties[1].PaillierPublickey, b1)
@@ -101,14 +97,14 @@ func TestMtA(t *testing.T) {
 	fmt.Println("Beta21neg", Beta21neg)
 	Beta21neg.Mod(Beta21neg, C.Params().N)
 	fmt.Println("Beta21neg2", Beta21neg.Bytes())
-	// Beta21negsafe := new(safenum.Int).SetBig(Beta21neg, Beta21neg.BitLen())
+	// Beta21negsafe := new(saferith.Int).SetBig(Beta21neg, Beta21neg.BitLen())
 	// EBeta21negsafe, _ := net.Parties[0].PaillierPublickey.Enc(Beta21negsafe)
 	EBeta21negsafe, _ := net.Parties[0].PaillierPublickey.Enc1(Beta21neg)
 	DBeta21negsafe, _ := SecertInfo["a"].PaillierSecertKey.Dec1(EBeta21negsafe)
 	fmt.Println("DBeta21negsafe", DBeta21negsafe)
 
 	//Ea1=b2*E(a1)+(-beta21)
-	//	b2safe := new(safenum.Int).SetBig(b2, b2.BitLen())
+	//	b2safe := new(saferith.Int).SetBig(b2, b2.BitLen())
 	//	Ea1.Mul(net.Parties[0].PaillierPublickey, b2safe)
 	//	Ea1.Add(net.Parties[0].PaillierPublickey, EBeta21negsafe)
 	Ea1 = Ea1.Mul1(net.Parties[0].PaillierPublickey, b2)

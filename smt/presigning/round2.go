@@ -5,13 +5,11 @@ import (
 	"math/big"
 	"sync"
 
+	"github.com/cronokirby/saferith"
 	"github.com/lianghuiqiang9/smt/modfiysm2"
 	"github.com/lianghuiqiang9/smt/network"
-	"github.com/lianghuiqiang9/smt/zk"
-
-	"github.com/cronokirby/safenum"
 	"github.com/lianghuiqiang9/smt/paillier"
-	// "github.com/taurusgroup/multi-party-sig/pkg/paillier"
+	"github.com/lianghuiqiang9/smt/zk"
 )
 
 type Round2Info struct {
@@ -85,7 +83,7 @@ func Round2(party *network.Party, net *network.Network, SecretInfo network.MSecr
 			//随机Beta，然后加密
 			Betaj, _ := modfiysm2.RandFieldElement(party.Curve, nil)
 			Betajneg := new(big.Int).Neg(Betaj)
-			Betajnegsafe := new(safenum.Int).SetBig(Betajneg, Betajneg.BitLen())
+			Betajnegsafe := new(saferith.Int).SetBig(Betajneg, Betajneg.BitLen())
 			EBetajnegsafe, fij := net.Parties[i].PaillierPublickey.Enc(Betajnegsafe)
 			//Beta2应该存储到SecretInfo中。
 			SecretInfo[party.ID].Beta2[net.Parties[i].ID] = Betaj
@@ -96,7 +94,7 @@ func Round2(party *network.Party, net *network.Network, SecretInfo network.MSecr
 			//点乘Gammai和Gj，换了MtAEncB换成MtAEncW，和Gammai换成Ki
 			Gj := SecretInfo[party.ID].MtAEncW[net.Parties[i].ID]
 			Eji := (*paillier.Ciphertext).Clone(Gj)
-			Kisafe := new(safenum.Int).SetBig(SecretInfo[party.ID].Ki, SecretInfo[party.ID].Ki.BitLen())
+			Kisafe := new(saferith.Int).SetBig(SecretInfo[party.ID].Ki, SecretInfo[party.ID].Ki.BitLen())
 			Eji = Eji.Mul(net.Parties[i].PaillierPublickey, Kisafe)
 			//加法，然后Eji计算完毕
 			Eji = Eji.Add(net.Parties[i].PaillierPublickey, EBetajnegsafe)

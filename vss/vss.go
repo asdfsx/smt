@@ -4,11 +4,9 @@ import (
 	"fmt"
 	"math/big"
 
+	"github.com/cronokirby/saferith"
 	"github.com/lianghuiqiang9/smt/modfiysm2"
 	"github.com/lianghuiqiang9/smt/network"
-
-	"github.com/cronokirby/safenum"
-	// "github.com/taurusgroup/multi-party-sig/pkg/paillier"
 	"github.com/lianghuiqiang9/smt/paillier"
 )
 
@@ -80,7 +78,7 @@ func Vssshare1(party *network.Party, net *network.Network, SecretInfo network.MS
 		yi.Mod(yi, party.Curve.Params().N)
 		Vssy[partyi.ID] = yi
 
-		CC := new(safenum.Int).SetBig(yi, yi.BitLen())
+		CC := new(saferith.Int).SetBig(yi, yi.BitLen())
 
 		ct2, _ := partyi.PaillierPublickey.Enc(CC)
 		VssEncy[partyi.ID] = ct2

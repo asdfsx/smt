@@ -7,7 +7,6 @@ import (
 	"math/big"
 
 	"github.com/fxamacker/cbor/v2"
-
 	msm2 "github.com/lianghuiqiang9/smt/modfiysm2"
 )
 

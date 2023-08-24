@@ -3,13 +3,11 @@ package vss
 import (
 	"crypto/rand"
 	"fmt"
-
-	"github.com/lianghuiqiang9/smt/modfiysm2"
-	"github.com/lianghuiqiang9/smt/network"
-
 	"math/big"
 	"testing"
 
+	"github.com/lianghuiqiang9/smt/modfiysm2"
+	"github.com/lianghuiqiang9/smt/network"
 	"github.com/tjfoc/gmsm/sm2"
 )
 

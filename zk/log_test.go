@@ -15,6 +15,16 @@ func TestLog(t *testing.T) {
 
 	logp := LogProve(hash, priv.Curve, priv.X, priv.Y, priv.D)
 
-	flag := logp.LogVerify(hash, priv.Curve, priv.X, priv.Y)
+	tt, err := logp.MarshalBinary()
+	if err != nil {
+		fmt.Println(err)
+	}
+	var logp2 Logp
+	err = logp2.UnmarshalBinary(tt)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	flag := logp2.LogVerify(hash, priv.Curve, priv.X, priv.Y)
 	fmt.Println(flag)
 }

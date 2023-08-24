@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/lianghuiqiang9/smt/network"
-
 	"github.com/tjfoc/gmsm/sm2"
 )
 

@@ -1,14 +1,14 @@
 package zk
 
 import (
-	//	"crypto/rand"
 	"fmt"
 	"testing"
 	"time"
 
-	//	paillierbig "github.com/roasbeef/go-go-gadget-paillier"
 	"github.com/taurusgroup/multi-party-sig/pkg/hash"
+	"github.com/taurusgroup/multi-party-sig/pkg/math/arith"
 	"github.com/taurusgroup/multi-party-sig/pkg/paillier"
+	"github.com/taurusgroup/multi-party-sig/pkg/pedersen"
 	"github.com/taurusgroup/multi-party-sig/pkg/pool"
 	prm "github.com/taurusgroup/multi-party-sig/pkg/zk/prm"
 )
@@ -27,9 +27,7 @@ func TestPrm(t *testing.T) {
 	ped, lambda := sk.GeneratePedersen()
 
 	public := prm.Public{
-		N: ped.N(),
-		S: ped.S(),
-		T: ped.T(),
+		Aux: pedersen.New(arith.ModulusFromN(ped.N()), ped.S(), ped.T()),
 	}
 
 	start1 := time.Now()

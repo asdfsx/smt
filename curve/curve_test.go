@@ -6,7 +6,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/cronokirby/safenum"
+	"github.com/cronokirby/saferith"
 	sm2 "github.com/tjfoc/gmsm/sm2"
 )
 
@@ -51,12 +51,12 @@ func TestCurve(t *testing.T) {
 	fmt.Println(d)
 	bigd := new(big.Int).SetBytes(dd)
 	fmt.Println(bigd)
-	//将big变为safenum
-	safed := new(safenum.Nat).SetBig(bigd, bigd.BitLen())
+	//将big变为saferith
+	safed := new(saferith.Nat).SetBig(bigd, bigd.BitLen())
 	fmt.Println(safed)
 	fmt.Println(14 + 13*16 + 15*16*16 + 6*16*16*16)
 
-	//将safenum变为big
+	//将saferith变为big
 	big2d := safed.Big()
 	fmt.Println(big2d)
 

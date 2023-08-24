@@ -4,14 +4,14 @@ import (
 	"crypto/rand"
 	"math/big"
 
-	"github.com/cronokirby/safenum"
+	"github.com/cronokirby/saferith"
 	"github.com/taurusgroup/multi-party-sig/pkg/math/sample"
 )
 
 // Ciphertext represents an integer of the for (1+N)ᵐρᴺ (mod N²), representing the encryption of m ∈ ℤₙˣ.
 type Ciphertext struct {
-	c    *safenum.Nat
-	cbig *big.Int //cbig只用于测试bigInt的paillier和safenumInt.Nat的paillier加密速度，对于协议无用
+	c    *saferith.Nat
+	cbig *big.Int //cbig只用于测试bigInt的paillier和saferithInt.Nat的paillier加密速度，对于协议无用
 }
 
 // Add sets ct to the homomorphic sum ct ⊕ ct₂.
@@ -46,14 +46,14 @@ func (cipher *Ciphertext) Mul1(pk *PublicKey, constant *big.Int) *Ciphertext {
 
 // Mul sets ct to the homomorphic multiplication of k ⊙ ct.
 // ct ← ctᵏ (mod N²).
-func (ct *Ciphertext) Mul(pk *PublicKey, k *safenum.Int) *Ciphertext {
+func (ct *Ciphertext) Mul(pk *PublicKey, k *saferith.Int) *Ciphertext {
 	if k == nil {
 		return ct
 	}
 	c := ct.c.Big()
 	x := k.Big()
 	cbig := new(big.Int).Exp(c, x, pk.NSquared)
-	csafenat := new(safenum.Nat).SetBig(cbig, cbig.BitLen())
+	csafenat := new(saferith.Nat).SetBig(cbig, cbig.BitLen())
 
 	return &Ciphertext{c: csafenat}
 }
@@ -65,7 +65,7 @@ func (ct *Ciphertext) Equal(ctA *Ciphertext) bool {
 
 // Clone returns a deep copy of ct.
 func (ct Ciphertext) Clone() *Ciphertext {
-	c := new(safenum.Nat)
+	c := new(saferith.Nat)
 	c.SetNat(ct.c)
 	return &Ciphertext{c: c}
 }
@@ -74,7 +74,7 @@ func (ct Ciphertext) Clone() *Ciphertext {
 // ct ← ct ⋅ nonceᴺ (mod N²).
 // If nonce is nil, a random one is generated.
 // The receiver is updated, and the nonce update is returned.
-func (ct *Ciphertext) Randomize(pk *PublicKey, nonce *safenum.Nat) *safenum.Nat {
+func (ct *Ciphertext) Randomize(pk *PublicKey, nonce *saferith.Nat) *saferith.Nat {
 	if nonce == nil {
 		nonce = sample.UnitModN(rand.Reader, pk.n.Modulus)
 	}
@@ -105,10 +105,10 @@ func (ct *Ciphertext) MarshalBinary() ([]byte, error) {
 }
 
 func (ct *Ciphertext) UnmarshalBinary(data []byte) error {
-	ct.c = new(safenum.Nat)
+	ct.c = new(saferith.Nat)
 	return ct.c.UnmarshalBinary(data)
 }
 
-func (ct *Ciphertext) Nat() *safenum.Nat {
-	return new(safenum.Nat).SetNat(ct.c)
+func (ct *Ciphertext) Nat() *saferith.Nat {
+	return new(saferith.Nat).SetNat(ct.c)
 }

@@ -5,13 +5,11 @@ import (
 	"math/big"
 	"sync"
 
+	"github.com/cronokirby/saferith"
 	"github.com/lianghuiqiang9/smt/network"
+	"github.com/lianghuiqiang9/smt/paillier"
 	"github.com/lianghuiqiang9/smt/vss"
 	"github.com/lianghuiqiang9/smt/zk"
-
-	"github.com/cronokirby/safenum"
-	"github.com/lianghuiqiang9/smt/paillier"
-	// "github.com/taurusgroup/multi-party-sig/pkg/paillier"
 )
 
 //需要
@@ -100,7 +98,7 @@ func Round3(party *network.Party, net *network.Network, SecretInfo network.MSecr
 	Round3logp := zk.LogProve(net.Hash, party.Curve, party.Xix, party.Xiy, SecretInfo[party.ID].Xi)
 	net.Mtx.Unlock()
 	//运行MultiAdd协议
-	x := new(safenum.Int).SetBig(SecretInfo[party.ID].Xi, SecretInfo[party.ID].Xi.BitLen())
+	x := new(saferith.Int).SetBig(SecretInfo[party.ID].Xi, SecretInfo[party.ID].Xi.BitLen())
 	//	fmt.Println("私钥转换成功", party.ID, SecretInfo[party.ID].Xi, x)
 	ct, v := party.PaillierPublickey.Enc(x)
 	//未广播的消息尽量还是不要直接放到party里面，免得引起误会。

@@ -4,33 +4,30 @@ import (
 	"crypto/rand"
 	"hash"
 
-	//	"math/big"
-
-	"github.com/cronokirby/safenum"
+	"github.com/cronokirby/saferith"
 	"github.com/lianghuiqiang9/smt/paillier"
 	"github.com/taurusgroup/multi-party-sig/pkg/math/sample"
 
-	//	"github.com/taurusgroup/multi-party-sig/pkg/paillier"
 	"github.com/taurusgroup/multi-party-sig/pkg/pedersen"
 )
 
 type Encp struct {
 	// S = sᵏtᵘ
-	S *safenum.Nat
+	S *saferith.Nat
 	// A = Enc₀ (α, r)
 	A *paillier.Ciphertext
 	// C = sᵃtᵍ
-	C *safenum.Nat
+	C *saferith.Nat
 	// Z₁ = α + e⋅k
-	Z1 *safenum.Int
+	Z1 *saferith.Int
 	// Z₂ = r ⋅ ρᵉ mod N₀
-	Z2 *safenum.Nat
+	Z2 *saferith.Nat
 	// Z₃ = γ + e⋅μ
-	Z3 *safenum.Int
+	Z3 *saferith.Int
 }
 
 // 输入hash，aux，PK,证明的K和k,rho
-func EncProve(hash hash.Hash, Aux *pedersen.Parameters, PK *paillier.PublicKey, K *paillier.Ciphertext, k *safenum.Int, rho *safenum.Nat) *Encp {
+func EncProve(hash hash.Hash, Aux *pedersen.Parameters, PK *paillier.PublicKey, K *paillier.Ciphertext, k *saferith.Int, rho *saferith.Nat) *Encp {
 	N := PK.N()
 	NModulus := PK.Modulus()
 	alpha := sample.IntervalLEps(rand.Reader)
@@ -44,19 +41,19 @@ func EncProve(hash hash.Hash, Aux *pedersen.Parameters, PK *paillier.PublicKey, 
 
 	hash.Write(BytesCombine(Aux.N().Bytes(), Aux.S().Bytes(), Aux.T().Bytes(), PK.Modulus().Bytes(), K.Nat().Bytes(), S.Bytes(), A.Nat().Bytes(), C.Bytes()))
 	bytes := hash.Sum(nil)
-	e := new(safenum.Int).SetBytes(bytes)
+	e := new(saferith.Int).SetBytes(bytes)
 	//注意这里没有控制e的范围，可能会出事请。
 
 	hash.Reset()
 
-	z1 := new(safenum.Int).SetInt(k)
+	z1 := new(saferith.Int).SetInt(k)
 	z1.Mul(e, z1, -1)
 	z1.Add(z1, alpha, -1)
 
 	z2 := NModulus.ExpI(rho, e)
 	z2.ModMul(z2, r, N)
 
-	z3 := new(safenum.Int).Mul(e, mu, -1)
+	z3 := new(saferith.Int).Mul(e, mu, -1)
 	z3.Add(z3, gamma, -1)
 
 	return &Encp{
@@ -74,9 +71,9 @@ func (zkp *Encp) EncVerify(hash hash.Hash, Aux *pedersen.Parameters, PK *paillie
 
 	hash.Write(BytesCombine(Aux.N().Bytes(), Aux.S().Bytes(), Aux.T().Bytes(), PK.Modulus().Bytes(), K.Nat().Bytes(), zkp.S.Bytes(), zkp.A.Nat().Bytes(), zkp.C.Bytes()))
 	bytes := hash.Sum(nil)
-	e := new(safenum.Int).SetBytes(bytes)
+	e := new(saferith.Int).SetBytes(bytes)
 	//注意这里没有控制e的范围，可能会出事请。
-	//	e = (*safenum.Int)(e.Mod(N))
+	//	e = (*saferith.Int)(e.Mod(N))
 	if !Aux.Verify(zkp.Z1, zkp.Z3, e, zkp.C, zkp.S) {
 		return false
 	}

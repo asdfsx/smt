@@ -50,9 +50,7 @@ import (
 	"testing"
 
 	"github.com/lianghuiqiang9/smt/network"
-
 	"github.com/lianghuiqiang9/smt/round"
-
 	"github.com/tjfoc/gmsm/sm2"
 )
 

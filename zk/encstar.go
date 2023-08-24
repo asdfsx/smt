@@ -3,16 +3,13 @@ package zk
 import (
 	"crypto/elliptic"
 	"crypto/rand"
+	"hash"
 	"math/big"
 
-	"hash"
-
-	"github.com/cronokirby/safenum"
+	"github.com/cronokirby/saferith"
 	"github.com/lianghuiqiang9/smt/paillier"
 	"github.com/taurusgroup/multi-party-sig/pkg/math/arith"
 	"github.com/taurusgroup/multi-party-sig/pkg/math/sample"
-
-	//	"github.com/taurusgroup/multi-party-sig/pkg/paillier"
 	"github.com/taurusgroup/multi-party-sig/pkg/pedersen"
 )
 
@@ -40,15 +37,15 @@ type Public struct {
 
 type Private struct {
 	// X = x
-	X *safenum.Int
+	X *saferith.Int
 	// Y = y
-	Y *safenum.Int
+	Y *saferith.Int
 	// S = s
 	// Original name: ρ
-	S *safenum.Nat
+	S *saferith.Nat
 	// R = r
 	// Original name: ρy
-	R *safenum.Nat
+	R *saferith.Nat
 }
 type Commitment struct {
 	// A = (α ⊙ C) ⊕ Encᵥ(β, ρ)
@@ -59,29 +56,29 @@ type Commitment struct {
 	// By = Encₚ(β, ρy)
 	By *paillier.Ciphertext
 	// E = sᵃ tᵍ (mod N)
-	E *safenum.Nat
+	E *saferith.Nat
 	// S = sˣ tᵐ (mod N)
-	S *safenum.Nat
+	S *saferith.Nat
 	// F = sᵇ tᵈ (mod N)
-	F *safenum.Nat
+	F *saferith.Nat
 	// T = sʸ tᵘ (mod N)
-	T *safenum.Nat
+	T *saferith.Nat
 }
 
 type Proof struct {
 	*Commitment
 	// Z1 = Z₁ = α + e⋅x
-	Z1 *safenum.Int
+	Z1 *saferith.Int
 	// Z2 = Z₂ = β + e⋅y
-	Z2 *safenum.Int
+	Z2 *saferith.Int
 	// Z3 = Z₃ = γ + e⋅m
-	Z3 *safenum.Int
+	Z3 *saferith.Int
 	// Z4 = Z₄ = δ + e⋅μ
-	Z4 *safenum.Int
+	Z4 *saferith.Int
 	// W = w = ρ⋅sᵉ (mod N₀)
-	W *safenum.Nat
+	W *saferith.Nat
 	// Wy = wy = ρy⋅rᵉ (mod N₁)
-	Wy *safenum.Nat
+	Wy *saferith.Nat
 }
 
 func (p *Proof) IsValid(public Public) bool {
@@ -117,7 +114,7 @@ func EncstarProof(hash hash.Hash, curve elliptic.Curve, public Public, private P
 	//将alpha变为正数
 	alpha1 := sample.IntervalLEps(rand.Reader)
 	alpha2 := alpha1.Abs()
-	alpha := new(safenum.Int).SetNat(alpha2)
+	alpha := new(saferith.Int).SetNat(alpha2)
 	beta := sample.IntervalLPrimeEps(rand.Reader)
 
 	rho := sample.UnitModN(rand.Reader, N0)
@@ -152,23 +149,23 @@ func EncstarProof(hash hash.Hash, curve elliptic.Curve, public Public, private P
 
 	hash.Write(BytesCombine(public.Aux.N().Bytes(), public.Aux.S().Bytes(), public.Aux.T().Bytes(), public.Prover.Modulus().Bytes(), public.Verifier.Modulus().Bytes(), public.Kv.Nat().Bytes(), public.Dv.Nat().Bytes(), public.Fp.Nat().Bytes(), public.Xx.Bytes(), public.Xy.Bytes(), A.Nat().Bytes(), Yx.Bytes(), Yy.Bytes(), commitment.By.Nat().Bytes(), E.Bytes(), S.Bytes(), F.Bytes(), T.Bytes()))
 	bytes := hash.Sum(nil)
-	e := new(safenum.Int).SetBytes(bytes)
+	e := new(saferith.Int).SetBytes(bytes)
 	//注意这里没有控制e的范围，可能会出事请。
 	hash.Reset()
 
 	// e•x+α
-	z1 := new(safenum.Int).SetInt(private.X)
+	z1 := new(saferith.Int).SetInt(private.X)
 	z1.Mul(e, z1, -1)
 	z1.Add(z1, alpha, -1)
 	// e•y+β
-	z2 := new(safenum.Int).SetInt(private.Y)
+	z2 := new(saferith.Int).SetInt(private.Y)
 	z2.Mul(e, z2, -1)
 	z2.Add(z2, beta, -1)
 	// e•m+γ
-	z3 := new(safenum.Int).Mul(e, m, -1)
+	z3 := new(saferith.Int).Mul(e, m, -1)
 	z3.Add(z3, gamma, -1)
 	// e•μ+δ
-	z4 := new(safenum.Int).Mul(e, mu, -1)
+	z4 := new(saferith.Int).Mul(e, mu, -1)
 	z4.Add(z4, delta, -1)
 	// ρ⋅sᵉ mod N₀
 	w := N0Modulus.ExpI(private.S, e)
@@ -205,9 +202,9 @@ func (p Proof) EncstarVerify(hash hash.Hash, curve elliptic.Curve, public Public
 
 	hash.Write(BytesCombine(public.Aux.N().Bytes(), public.Aux.S().Bytes(), public.Aux.T().Bytes(), public.Prover.Modulus().Bytes(), public.Verifier.Modulus().Bytes(), public.Kv.Nat().Bytes(), public.Dv.Nat().Bytes(), public.Fp.Nat().Bytes(), public.Xx.Bytes(), public.Xy.Bytes(), p.Commitment.A.Nat().Bytes(), p.Commitment.Bxx.Bytes(), p.Commitment.Bxy.Bytes(), p.Commitment.By.Nat().Bytes(), p.Commitment.E.Bytes(), p.Commitment.S.Bytes(), p.Commitment.F.Bytes(), p.Commitment.T.Bytes()))
 	bytes := hash.Sum(nil)
-	e := new(safenum.Int).SetBytes(bytes)
+	e := new(saferith.Int).SetBytes(bytes)
 	//注意这里没有控制e的范围，可能会出事请。
-	//	e = (*safenum.Int)(e.Mod(N))
+	//	e = (*saferith.Int)(e.Mod(N))
 	hash.Reset()
 
 	if !public.Aux.Verify(p.Z1, p.Z3, e, p.E, p.S) {

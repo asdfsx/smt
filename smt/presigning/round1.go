@@ -5,14 +5,12 @@ import (
 	"math/big"
 	"sync"
 
+	"github.com/cronokirby/saferith"
 	"github.com/lianghuiqiang9/smt/modfiysm2"
 	"github.com/lianghuiqiang9/smt/network"
+	"github.com/lianghuiqiang9/smt/paillier"
 	"github.com/lianghuiqiang9/smt/vss"
 	"github.com/lianghuiqiang9/smt/zk"
-
-	"github.com/cronokirby/safenum"
-	"github.com/lianghuiqiang9/smt/paillier"
-	// "github.com/taurusgroup/multi-party-sig/pkg/paillier"
 )
 
 type Round1Info struct {
@@ -88,7 +86,7 @@ func Round1(party *network.Party, net *network.Network, SecretInfo network.MSecr
 	//Ai,Bi,ai,bi
 	//最后生成签名的随机点R，和chi=xiki的加共享
 	//这里和上面的wix
-	x := new(safenum.Int).SetBig(wi, wi.BitLen())
+	x := new(saferith.Int).SetBig(wi, wi.BitLen())
 	ct, v := party.PaillierPublickey.Enc(x)
 	SecretInfo[party.ID].EncWi = ct
 	//生成zkencp
