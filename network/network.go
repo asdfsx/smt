@@ -37,8 +37,28 @@ func NewNetwork(Parties MParties, N, threshold int, curve elliptic.Curve) Networ
 		Channels: make(map[string]chan *Message, len(Parties)*2),
 		Hash:     sha256.New(),
 	}
-
 }
+
+func NewNetwork2(Parties MParties, N, threshold int, curve elliptic.Curve, h hash.Hash) Network {
+	if Parties == nil {
+		//显然这里初始化N的时候不能超过26
+		//显然这里需要make一个真实的东西。
+		Parties = make([]Party, N)
+		for i := 0; i < N; i++ {
+			Parties[i].Num = i
+			Parties[i].ID = string('a' + rune(i))
+			Parties[i].N = N
+			Parties[i].T = threshold
+			Parties[i].Curve = curve
+		}
+	}
+	return Network{
+		Parties:  Parties,
+		Channels: make(map[string]chan *Message, len(Parties)*2),
+		Hash:     h,
+	}
+}
+
 func (n *Network) Init() {
 	N := len(n.Parties)
 	for _, party := range n.Parties {

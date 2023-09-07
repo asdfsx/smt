@@ -1,9 +1,11 @@
 package signing
 
 import (
+	"crypto/ecdsa"
 	"math/big"
 	"sync"
 
+	"github.com/emmansun/gmsm/sm2"
 	"github.com/lianghuiqiang9/smt/network"
 	"github.com/lianghuiqiang9/smt/zk"
 )
@@ -23,14 +25,25 @@ func Round1(party *network.Party, net *network.Network, SecretInfo network.MSecr
 	//如何计算Z？？？，Rtig,Rho,Xx,Xy,G。
 	//先这样计算吧。反正都一样的。
 
+	// 使用 github.com/emmansun/gmsm/sm2 中的 CalculateZA 来计算 Z
+
 	//设置签名消息
 	msg := net.Msg
 	net.Mtx.Lock()
 	//计算Z
-	net.Hash.Write(zk.BytesCombine(party.Rtig.Bytes(), party.Rho.Bytes(), party.Xx.Bytes(), party.Xy.Bytes()))
-	bytes := net.Hash.Sum(nil)
+	// var uid big.Int
+	// uid.Add(party.Rtig, party.Rho)
+	var defaultUID = []byte{0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38}
+	za, _ := sm2.CalculateZA(&ecdsa.PublicKey{
+		Curve: sm2.P256(),
+		X:     party.Xx,
+		Y:     party.Xy,
+	}, defaultUID)
+
+	// net.Hash.Write(zk.BytesCombine(party.Rtig.Bytes(), party.Rho.Bytes(), party.Xx.Bytes(), party.Xy.Bytes()))
+	// bytes := net.Hash.Sum(nil)
 	//将hash映射到椭圆曲线阶上。
-	Z := new(big.Int).SetBytes(bytes)
+	Z := new(big.Int).SetBytes(za)
 	net.Hash.Reset()
 
 	//计算e

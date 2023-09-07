@@ -5,7 +5,6 @@ import (
 	"crypto/elliptic"
 	"crypto/rand"
 	"hash"
-
 	"io"
 	"math/big"
 
@@ -79,8 +78,9 @@ func Sign(C elliptic.Curve, hash hash.Hash, msg []byte, sk *big.Int, random io.R
 }
 
 func Verify(C elliptic.Curve, hash hash.Hash, msg []byte, Z *big.Int, pkx, pky *big.Int, r *big.Int, s *big.Int) bool {
-
-	hash.Write(BytesCombine(Z.Bytes(), msg))
+	hash.Write(Z.Bytes())
+	hash.Write(msg)
+	// hash.Write(BytesCombine(Z.Bytes(), msg))
 	bytes := hash.Sum(nil)
 	//将hash映射到椭圆曲线阶上。
 	e2 := new(big.Int).SetBytes(bytes)
@@ -104,7 +104,11 @@ func Verify(C elliptic.Curve, hash hash.Hash, msg []byte, Z *big.Int, pkx, pky *
 }
 
 func ComputeZ(hash hash.Hash, party *network.Party) *big.Int {
-	hash.Write(BytesCombine(party.Rtig.Bytes(), party.Rho.Bytes(), party.Xx.Bytes(), party.Xy.Bytes()))
+	hash.Write(party.Rtig.Bytes())
+	hash.Write(party.Rho.Bytes())
+	hash.Write(party.Xx.Bytes())
+	hash.Write(party.Xy.Bytes())
+	// hash.Write(BytesCombine(party.Rtig.Bytes(), party.Rho.Bytes(), party.Xx.Bytes(), party.Xy.Bytes()))
 	bytes := hash.Sum(nil)
 	Z := new(big.Int).SetBytes(bytes)
 	hash.Reset()

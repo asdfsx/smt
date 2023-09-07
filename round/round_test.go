@@ -5,12 +5,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/emmansun/gmsm/sm2/sm2ec"
 	"github.com/lianghuiqiang9/smt/network"
-	"github.com/tjfoc/gmsm/sm2"
 )
 
 func TestRound(t *testing.T) {
-	c := sm2.P256Sm2()
+	c := sm2ec.P256()
 
 	//可以初始化Parties，也可以不初始化吧。
 	N := 4

@@ -5,15 +5,15 @@ import (
 	"math/big"
 	"testing"
 
+	"github.com/emmansun/gmsm/sm2/sm2ec"
 	"github.com/lianghuiqiang9/smt/modfiysm2"
 	"github.com/lianghuiqiang9/smt/network"
 	"github.com/lianghuiqiang9/smt/paillier"
-	"github.com/tjfoc/gmsm/sm2"
 )
 
 func TestMtA(t *testing.T) {
 	//选定初始化曲线
-	C := sm2.P256Sm2()
+	C := sm2ec.P256()
 	//确定参与方人数N<26
 	N := 4
 	//确定阈值T<=N

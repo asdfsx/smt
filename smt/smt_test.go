@@ -5,9 +5,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/emmansun/gmsm/sm2/sm2ec"
 	"github.com/lianghuiqiang9/smt/modfiysm2"
 	"github.com/lianghuiqiang9/smt/network"
-	"github.com/tjfoc/gmsm/sm2"
 )
 
 var net1 network.Network
@@ -16,7 +16,7 @@ var SecretInfo1 network.MSecretPartiesInfoMap
 func TestSmt(t *testing.T) {
 
 	//选定初始化曲线
-	C := sm2.P256Sm2()
+	C := sm2ec.P256()
 	//确定参与方人数N<26
 	N := 4
 	//确定阈值T<=N
@@ -68,7 +68,7 @@ func BenchmarkSmt(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		//选定初始化曲线
-		C := sm2.P256Sm2()
+		C := sm2ec.P256()
 		//确定参与方人数N<26
 		N := 4
 		//确定阈值T<=N

@@ -7,14 +7,14 @@ import (
 	"testing"
 
 	"github.com/cronokirby/saferith"
+	"github.com/emmansun/gmsm/sm2"
 	msm2 "github.com/lianghuiqiang9/smt/modfiysm2"
 	"github.com/taurusgroup/multi-party-sig/pkg/math/sample"
-	"github.com/tjfoc/gmsm/sm2"
 )
 
 func TestEncstar(t *testing.T) {
 
-	priv, _ := sm2.GenerateKey()
+	priv, _ := sm2.GenerateKey(rand.Reader)
 
 	xi, _ := msm2.RandFieldElement(priv.Curve, nil)
 

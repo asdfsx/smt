@@ -1,20 +1,21 @@
 package curve
 
 import (
+	"crypto/rand"
 	"fmt"
 	"math/big"
 	"reflect"
 	"testing"
 
 	"github.com/cronokirby/saferith"
-	sm2 "github.com/tjfoc/gmsm/sm2"
+	"github.com/emmansun/gmsm/sm2"
 )
 
 func TestCurve(t *testing.T) {
 
 	//这里主要用于调试公钥和sm2曲线的一些基本操作。有一个问题就是P+P=0，但是2P是正确的
 
-	priv, _ := sm2.GenerateKey()
+	priv, _ := sm2.GenerateKey(rand.Reader)
 
 	n := priv.Params().N
 	fmt.Println(n, reflect.TypeOf(n))

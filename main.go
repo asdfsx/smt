@@ -1,15 +1,17 @@
 package main
 
 import (
+	"crypto/ecdsa"
 	"fmt"
 	"math/big"
 	"time"
 
+	"github.com/emmansun/gmsm/sm2"
+	"github.com/emmansun/gmsm/sm2/sm2ec"
+	"github.com/emmansun/gmsm/sm3"
 	"github.com/lianghuiqiang9/smt/modfiysm2"
 	"github.com/lianghuiqiang9/smt/network"
 	"github.com/lianghuiqiang9/smt/smt"
-
-	"github.com/tjfoc/gmsm/sm2"
 )
 
 func main() {
@@ -17,13 +19,17 @@ func main() {
 	start1 := time.Now()
 
 	//选定初始化曲线
-	C := sm2.P256Sm2()
+	C := sm2ec.P256()
 	//确定参与方人数N<26
 	N := 2
 	//确定阈值T<=N
 	T := 2
+	// hash function
+	// HashFunc := sha256.New
+	HashFunc := sm3.New
 	//建立network
-	var net = network.NewNetwork(nil, N, T, C)
+	// var net = network.NewNetwork(nil, N, T, C)
+	var net = network.NewNetwork2(nil, N, T, C, HashFunc())
 	//初始化通信信道
 	net.Init()
 	//初始化秘密信息map，每个参与方只使用自己的的。
@@ -65,12 +71,47 @@ func main() {
 	S := new(big.Int).Set(net.Parties[0].S)
 	party := net.Parties[0]
 
-	Z := modfiysm2.ComputeZ(net.Hash, &party)
-	flag := modfiysm2.Verify(C, net.Hash, msg, Z, party.Xx, party.Xy, R, S)
+	newHash := HashFunc()
+	Z := modfiysm2.ComputeZ(newHash, &party)
+	newHash = HashFunc()
+	flag := modfiysm2.Verify(C, newHash, msg, Z, party.Xx, party.Xy, R, S)
 	fmt.Println("签名验证结果", flag)
 
 	fmt.Println("main end")
 
+	fmt.Printf("Z %x\n", Z)
+	fmt.Printf("pub key Pkx %x\n", party.Xx)
+	fmt.Printf("pub key Pky %x\n", party.Xy)
+	fmt.Printf("sig R %x\n", R)
+	fmt.Printf("sig S %x\n", S)
+	fmt.Printf("msg %x\n", msg)
+
+	var defaultUID = []byte{0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38}
+	z, _ := sm2.CalculateZA(&ecdsa.PublicKey{
+		Curve: sm2.P256(),
+		X:     party.Xx,
+		Y:     party.Xy,
+	}, defaultUID)
+	hash := HashFunc()
+	// hash.Write(modfiysm2.BytesCombine(Z.Bytes(), msg))
+	hash.Write(z)
+	hash.Write(msg)
+	bytes := hash.Sum(nil)
+	//将hash映射到椭圆曲线阶上。
+	e2 := new(big.Int).SetBytes(bytes)
+	e2 = e2.Mod(e2, C.Params().N)
+	hash.Reset() //要养成一个良好的习惯。
+	pub := ecdsa.PublicKey{
+		Curve: sm2.P256(),
+		X:     party.Xx,
+		Y:     party.Xy,
+	}
+
+	var uid big.Int
+	uid.Add(party.Rtig, party.Rho)
+	fmt.Println("签名验证结果 using gmsm ", sm2.Verify(&pub, e2.Bytes(), R, S))
+	fmt.Println("签名验证结果 using msm2 ", modfiysm2.Verify(C, hash, msg, new(big.Int).SetBytes(z), party.Xx, party.Xy, R, S))
+	fmt.Println("签名验证结果 using gmsm ", sm2.VerifyWithSM2(&pub, nil, msg, R, S))
 }
 
 /*

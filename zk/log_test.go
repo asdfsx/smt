@@ -1,15 +1,16 @@
 package zk
 
 import (
+	"crypto/rand"
 	"crypto/sha256"
 	"fmt"
 	"testing"
 
-	"github.com/tjfoc/gmsm/sm2"
+	"github.com/emmansun/gmsm/sm2"
 )
 
 func TestLog(t *testing.T) {
-	priv, _ := sm2.GenerateKey()
+	priv, _ := sm2.GenerateKey(rand.Reader)
 
 	hash := sha256.New()
 

@@ -5,11 +5,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/tjfoc/gmsm/sm2"
+	"github.com/emmansun/gmsm/sm2/sm2ec"
 )
 
 func TestNetwork(t *testing.T) {
-	c := sm2.P256Sm2()
+	c := sm2ec.P256()
 	N := 4
 	Threshold := 2
 	var net = NewNetwork(nil, N, Threshold, c)
